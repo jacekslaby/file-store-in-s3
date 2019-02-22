@@ -15,7 +15,7 @@ register_type(Text=lambda param: param)
 
 @given(u'There are "{files_count:Int}" files in domain "{domain_name:Text}"')
 def step_impl(context, files_count, domain_name):
-    pass
+    assert files_count == len(context.files_existing_in_domains[domain_name])
 
 
 @when(u'I query for files from domain matching regexp "{domain_regexp:Text}"')

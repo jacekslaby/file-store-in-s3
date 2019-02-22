@@ -69,3 +69,9 @@ QFIT_QUERY_FILES_APP_URL="http://localhost:8090"
 
 behave
 ```
+
+## @TODO
+
+- Use pytest-bdd instead of behave, because assert messages are better
+  https://automationpanda.com/2018/10/22/python-testing-101-pytest-bdd/
+  "all of pytest‘s features and plugins can be used with pytest-bdd. This is a huge advantage!"
