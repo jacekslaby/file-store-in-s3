@@ -44,6 +44,15 @@ REPOSITORY                         TAG                  IMAGE ID            CREA
 $ run_on_local_docker__run_all_it.sh 
 ```
 
+### Configure PyCharm
+
+Add Run configuration as described here: https://stackoverflow.com/questions/15860074/pycharm-how-to-run-behave-exe
+```
+Script: put dot (.) in here [this way PyCharm recognizes the configuration as valid and doesn't show red cross mark]
+Working Directory points to the dirctory where .feature file is
+Interpreter options: -m behave
+```
+
 ## Building Docker image
 
 ```
