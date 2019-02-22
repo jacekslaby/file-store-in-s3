@@ -1,32 +1,19 @@
 from behave import *
 
-from behave import register_type
-
 
 # https://jenisys.github.io/behave.example/tutorials/tutorial10.html
 #
-def parse_number(text):
-    """
-    Convert parsed text into a number.
-    :param text: Parsed text, called by :py:meth:`parse.Parser.parse()`.
-    :return: Number instance (integer), created from parsed text.
-    """
-    return int(text)
+# -- REGISTER: User-defined type converter (parse_type).
+# Let's parse "Int" as is int.
+register_type(Int=lambda param: int(param))
 
 
 # -- REGISTER: User-defined type converter (parse_type).
-register_type(Number=parse_number)
+# Let's parse "Text" as is.
+register_type(Text=lambda param: param)
 
 
-def parse_text(text):
-    return text
-
-
-# -- REGISTER: User-defined type converter (parse_type).
-register_type(Text=parse_text)
-
-
-@given(u'There are "{files_count:Number}" files in domain "{domain_name:Text}"')
+@given(u'There are "{files_count:Int}" files in domain "{domain_name:Text}"')
 def step_impl(context, files_count, domain_name):
     pass
 
@@ -36,7 +23,7 @@ def step_impl(context, domain_regexp):
     pass
 
 
-@then(u'I receive "{files_count:Number}" files from domain "{domain_name:Text}"')
+@then(u'I receive "{files_count:Int}" files from domain "{domain_name:Text}"')
 def step_impl(context, files_count, domain_name):
     pass
 
