@@ -42,11 +42,18 @@ def before_all(context):
     #  - value is list of object names in this bucket
     #
     for bucket_name, files_list in files_existing_in_s3_buckets.items():
-        # First create bucket.
-        bucket = s3_resource.create_bucket(Bucket=bucket_name.lower(), CreateBucketConfiguration=bucket_configuration)
-        # Then create all required objects. (in this bucket)
-        for object_name in files_list:
-            bucket.Object(object_name)
+        # Let's assure existence of buckets and objects.
+        # (BTW: If a bucket exists then we assume that its objects exist as well. (i.e. It's another run of these tests)
+        #       The reason for this is that checking for object existence is expensive and not really required here.)
+        #
+        # (https://stackoverflow.com/questions/26871884/how-can-i-easily-determine-if-a-boto-3-s3-bucket-resource-exists)
+        bucket = s3_resource.Bucket(bucket_name.lower())
+        if not bucket.creation_date:
+            # Bucket does not exist. We need to create it.
+            bucket = s3_resource.create_bucket(Bucket=bucket_name.lower(), CreateBucketConfiguration=bucket_configuration)
+            # Then create all required objects. (in this bucket)
+            for object_name in files_list:
+                bucket.Object(object_name)
 
     # provide files in the scenario's context   (e.g. to check correctness of returned results)
     context.files_existing_in_domains = files_existing_in_domains
