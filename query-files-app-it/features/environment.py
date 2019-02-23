@@ -2,7 +2,8 @@ import boto3
 
 # @TODO Read config settings from env variables.
 environment_name = 'it'
-region_name = 'Dummy'
+s3_region_name = 'Dummy'
+s3_endpoint_url = 'http://192.168.99.100:4572'
 
 # Define test data to be created in s3.
 #
@@ -26,14 +27,14 @@ def before_all(context):
     #   https://stackoverflow.com/questions/32618216/overwrite-s3-endpoint-using-boto3-configuration-file
     #   https://stackoverflow.com/questions/48690698/using-boto3-through-sam-local-to-interact-with-localstack-s3
     #   )
-    s3_resource = boto3.resource('s3', endpoint_url='http://localhost',
+    s3_resource = boto3.resource('s3', endpoint_url=s3_endpoint_url,
                                  use_ssl=False,
                                  region_name='Dummy',
                                  aws_access_key_id='AccessKey',
                                  aws_secret_access_key='SecertKey')
     # Specify the region.
     # (otherwise: "If you don't specify a region, the bucket will be created in US Standard." )
-    bucket_configuration = {'LocationConstraint': region_name}
+    bucket_configuration = {'LocationConstraint': s3_region_name}
 
     # Create all required buckets and objects in s3, (it takes time so we do it before all features/scenarios are run)
     # based on dictionary in which:
