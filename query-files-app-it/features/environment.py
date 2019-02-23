@@ -43,10 +43,10 @@ def before_all(context):
     #
     for bucket_name, files_list in files_existing_in_s3_buckets.items():
         # First create bucket.
-        s3_resource.create_bucket(Bucket=bucket_name.lower(), CreateBucketConfiguration=bucket_configuration)
+        bucket = s3_resource.create_bucket(Bucket=bucket_name.lower(), CreateBucketConfiguration=bucket_configuration)
         # Then create all required objects. (in this bucket)
         for object_name in files_list:
-            s3_resource.Object(bucket_name=bucket_name, key=object_name)
+            bucket.Object(object_name)
 
     # provide files in the scenario's context   (e.g. to check correctness of returned results)
     context.files_existing_in_domains = files_existing_in_domains
