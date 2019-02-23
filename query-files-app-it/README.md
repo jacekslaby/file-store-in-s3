@@ -44,6 +44,19 @@ REPOSITORY                         TAG                  IMAGE ID            CREA
 $ run_on_local_docker__run_all_it.sh 
 ```
 
+## Developing
+
+### Using localstack
+
+Only s3 service is used. Without persistence.
+
+https://github.com/localstack/localstack
+
+(localstack selected based on: 
+- "If you're ok with depending on a running docker container [...] consider using localstack" https://stackoverflow.com/questions/6615988/how-to-mock-amazon-s3-in-an-integration-test
+- "SAM Local is basically just for testing your Lambda functions locally." https://stackoverflow.com/questions/45719388/aws-sam-local-vs-localstack
+)
+
 ### Configure PyCharm
 
 Add Run configuration as described here: https://stackoverflow.com/questions/15860074/pycharm-how-to-run-behave-exe
@@ -53,7 +66,7 @@ Working Directory points to the dirctory where .feature file is
 Interpreter options: -m behave
 ```
 
-## Building Docker image
+### Building Docker image
 
 ```
 docker build . -t j9soft/query-files-app-it:latest
@@ -62,7 +75,7 @@ docker build . -t j9soft/query-files-app-it:latest
 docker run -e "QFIT_QUERY_FILES_APP_URL=http://localhost:8090"  --name query-files-app--it --rm --network=query-files-app_backend_net -it j9soft/query-files-app-it:latest
 ```
 
-## Running locally (not from Docker) during development
+### Running locally (not from Docker) during development
 
 ```
 QFIT_QUERY_FILES_APP_URL="http://localhost:8090"
