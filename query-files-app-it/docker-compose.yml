@@ -8,9 +8,8 @@ services:
       - "${PORT_WEB_UI-8080}:${PORT_WEB_UI-8080}"
     environment:
       - SERVICES=s3
-      - DATA_DIR=""                  # disable persistence
+      - DATA_DIR=                  # disable persistence
       - PORT_WEB_UI=${PORT_WEB_UI- }
       - DOCKER_HOST=unix:///var/run/docker.sock
     volumes:
-      - "${TMPDIR:-/tmp/localstack}:/tmp/localstack"
       - "/var/run/docker.sock:/var/run/docker.sock"
