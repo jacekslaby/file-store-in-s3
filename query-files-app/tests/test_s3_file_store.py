@@ -31,7 +31,8 @@ def setup_test_data():
         (test_bucket_names, 'shell|ca', generate_expected('shell', 'ca')),
         (test_bucket_names, 'bp.*', generate_expected('bp-upstream', 'bp-downstream')),
         (test_bucket_names, 'bp.*|ca', generate_expected('bp-upstream', 'bp-downstream', 'ca')),
-        (test_bucket_names, 'alos', {})
+        (test_bucket_names, 'alos', {}),
+        (test_bucket_names, None, {})
     ]
 
 
