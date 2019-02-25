@@ -44,6 +44,10 @@ class S3FileStore:
     def _get_domains_with_buckets(self, all_buckets_names, read_domain_regex_str):
         """retrieve matching domains. Returns a dict containing domain names as keys and bucket names as values."""
 
+        if read_domain_regex_str is None:
+            # Return nothing for missing regex.
+            return {}
+
         domain_pattern = re.compile(read_domain_regex_str)
 
         # Filter out buckets not belonging to this environment
