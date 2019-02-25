@@ -28,8 +28,10 @@ def setup_test_data():
         ([], 'dummy', {}),
         (test_bucket_names, 'shell', generate_expected('shell')),
         (test_bucket_names, 'shell.*', generate_expected('shell')),
+        (test_bucket_names, 'shell|ca', generate_expected('shell', 'ca')),
         (test_bucket_names, 'bp.*', generate_expected('bp-upstream', 'bp-downstream')),
-        (test_bucket_names, 'none', {})
+        (test_bucket_names, 'bp.*|ca', generate_expected('bp-upstream', 'bp-downstream', 'ca')),
+        (test_bucket_names, 'alos', {})
     ]
 
 
@@ -42,17 +44,11 @@ def s3_file_store():
     return S3FileStore()
 
 
+# Let's use multiple input scenarios to test the method.
+# (see also https://docs.pytest.org/en/latest/example/parametrize.html#paramexamples )
+#
 @pytest.mark.parametrize("all_buckets_names,read_domain_regex_str,expected", test_data_for_get_domains_with_buckets)
 def test_get_domains_with_buckets(s3_file_store, all_buckets_names, read_domain_regex_str, expected):
-    """verify that method works correctly for different input scenarios"""
-    
-    result = s3_file_store._get_domains_with_buckets(all_buckets_names, read_domain_regex_str)
-    assert result == expected
-
-
-@pytest.mark.parametrize("all_buckets_names,read_domain_regex_str,expected", test_data_for_get_domains_with_buckets)
-def test_get_domains_with_buckets(s3_file_store, all_buckets_names, read_domain_regex_str, expected):
-    """verify that method works correctly for different input scenarios"""
 
     result = s3_file_store._get_domains_with_buckets(all_buckets_names, read_domain_regex_str)
     assert result == expected
