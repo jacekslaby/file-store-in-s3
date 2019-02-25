@@ -23,6 +23,11 @@ pip install -r requirements.txt
 (query-files-app) $ pip install flask
 (query-files-app) $ pip freeze  | grep -v 'pkg-resources==0.0.0' > requirements.txt
 
+### Unit tests
+
+(query-files-app) $ cd file-store-in-s3/query-files-app
+pytest
+
 ### Running
 
 http://flask.pocoo.org/docs/1.0/tutorial/factory/
