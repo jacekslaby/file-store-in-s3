@@ -1,6 +1,9 @@
 import boto3
 import re
 import os
+import logging
+
+logger = logging.getLogger(__name__)
 
 # Read global config settings from env variables.  (e.g. to have different settings for development and production)
 #
@@ -26,6 +29,10 @@ if 'QFA_AWS_S3_ENDPOINT_URL' in os.environ:
 else:
     # For production we use defaults. (i.e. boto3 will use defaults)
     s3_config = None
+
+# @TODO better logging
+logger.warning("S3FileStore global config: environment_name = '%s'", environment_name)
+logger.warning("S3FileStore global config: s3_config = '%s'", s3_config)
 
 
 class S3FileStore:
@@ -68,7 +75,10 @@ class S3FileStore:
         """retrieve names of all existing buckets"""
 
         # Every time we need to read available buckets. (because admin could add/remove some buckets in the meantime)
-        return self.s3_resource.get_available_subresources()
+        result = self.s3_resource.get_available_subresources()
+        logger.warning("S3FileStore: _get_all_buckets_names = '%s'", result)
+
+        return result
 
     def _get_domains_with_buckets(self, all_buckets_names, read_domain_regex_str):
         """retrieve matching domains. Returns a dict containing domain names as keys and bucket names as values."""
@@ -90,7 +100,8 @@ class S3FileStore:
                 domain_name_end_position = bucket_name.find(S3FileStore.NAME_SEPARATOR, domain_name_start_position)
                 if domain_name_end_position < 0:
                     # @TODO add better logging
-                    print(f'Unsupported bucket encountered: "{bucket_name}" - domain name is not between separators like "<environment>--<domain name>--...".')
+                    logger.warning(f'Unsupported bucket encountered: "{bucket_name}'
+                                   f'" - expected format is like "<environment>--<domain name>--<uuid>".')
                     continue
 
                 domain_name = bucket_name[domain_name_start_position:domain_name_end_position]
@@ -115,4 +126,3 @@ class S3FileStore:
             result[domain_name] = domain_file_names
 
         return result
-
