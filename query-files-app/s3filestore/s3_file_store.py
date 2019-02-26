@@ -24,7 +24,10 @@ else:
 if 'QFA_AWS_S3_ENDPOINT_URL' in os.environ:
     # For dev we redefine config used by boto3.
     s3_config = {'endpoint_url': os.environ['QFA_AWS_S3_ENDPOINT_URL'],
-                 'use_ssl': False            # For now we assume it makes sense. (no need to add another env var)
+                 'use_ssl': False,            # For now we assume it makes sense. (no need to add another env var)
+                 'region_name': 'Dummy',
+                 'aws_access_key_id': 'AccessKey',
+                 'aws_secret_access_key': 'SecretKey'
                  }
 else:
     # For production we use defaults. (i.e. boto3 will use defaults)
@@ -75,7 +78,7 @@ class S3FileStore:
         """retrieve names of all existing buckets"""
 
         # Every time we need to read available buckets. (because admin could add/remove some buckets in the meantime)
-        result = self.s3_resource.get_available_subresources()
+        result = [bucket.name for bucket in self.s3_resource.buckets.all()]
         logger.warning("S3FileStore: _get_all_buckets_names = '%s'", result)
 
         return result
@@ -110,6 +113,7 @@ class S3FileStore:
                 if domain_pattern.match(domain_name):
                     result[domain_name] = bucket_name
 
+        logger.warning("S3FileStore: _get_domains_with_buckets = '%s'", result)
         return result
 
     def _get_file_names_from_objects(self, domains_with_buckets):
@@ -122,7 +126,8 @@ class S3FileStore:
         result = {}
         for domain_name, bucket_name in domains_with_buckets.items():
             bucket = self.s3_resource.Bucket(bucket_name)
-            domain_file_names = [object_name for object_name in bucket.get_available_subresources()]
+            domain_file_names = [obj.key for obj in bucket.objects.all()]
             result[domain_name] = domain_file_names
 
+        logger.warning("S3FileStore: _get_file_names_from_objects = '%s'", result)
         return result
