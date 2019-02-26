@@ -92,7 +92,15 @@ def before_all(context):
             bucket = s3_resource.create_bucket(Bucket=bucket_name.lower(), CreateBucketConfiguration=bucket_configuration)
             # Then create all required objects. (in this bucket)
             for object_name in files_list:
-                bucket.Object(object_name)
+                object = bucket.Object(object_name)
+                # @TODO better logging
+                print(f"Created object '{object.key}' in bucket '{object.bucket_name}'")
+
+        existing_objects = [obj.key for obj in bucket.objects.all()]
+        # @TODO better logging
+        print(f"Bucket '{bucket_name}' contains objects: {existing_objects}")
+        assert set(files_list) == set(existing_objects),\
+            f"Test setup FAILED to create objects in s3.  Wanted: '{files_list}', existing: '{existing_objects}'."
 
     # provide files in the scenario's context   (e.g. to check correctness of returned results)
     context.files_existing_in_domains = files_existing_in_domains
