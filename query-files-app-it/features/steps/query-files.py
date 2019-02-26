@@ -1,9 +1,6 @@
 from behave import *
 import requests
 
-# @TODO Read config settings from env variables.
-apiurl = 'http://192.168.99.100:3001/'
-
 # https://jenisys.github.io/behave.example/tutorials/tutorial10.html
 #
 # -- REGISTER: User-defined type converter (parse_type).
@@ -24,7 +21,7 @@ def step_impl(context, files_count, domain_name):
 @when(u'I query for files from domain matching regexp "{domain_regexp:Text}"')
 def step_impl(context, domain_regexp):
     # Let's load files matching domain regexp.
-    url = apiurl + 'v1/files?readDomainRegexp=' + domain_regexp
+    url = context.query_files_app_url + '/v1/files?readDomainRegexp=' + domain_regexp
     r = requests.get(url)
     r.raise_for_status()
 

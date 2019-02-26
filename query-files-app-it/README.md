@@ -24,10 +24,6 @@ $ cd file-store-in-s3/query-files-app-it
 (file-store-in-s3) $ pip freeze > requirements.txt
 
 
-
-
-
-
 @TODO
 
 # Build images of modules: (and put them in the local docker)
@@ -46,13 +42,13 @@ $ run_on_local_docker__run_all_it.sh
 
 ## Developing
 
-### Using localstack
+### Using [localstack](https://github.com/localstack/localstack)
 
 Only s3 service is used. Without persistence.
 
-https://github.com/localstack/localstack
+To browse contents use: http://192.168.99.100:8080
 
-(localstack selected based on: 
+(localstack was selected based on the following comments: 
 - "If you're ok with depending on a running docker container [...] consider using localstack" https://stackoverflow.com/questions/6615988/how-to-mock-amazon-s3-in-an-integration-test
 - "SAM Local is basically just for testing your Lambda functions locally." https://stackoverflow.com/questions/45719388/aws-sam-local-vs-localstack
 )
@@ -64,6 +60,7 @@ Add Run configuration as described here: https://stackoverflow.com/questions/158
 Script: put dot (.) in here [this way PyCharm recognizes the configuration as valid and doesn't show red cross mark]
 Working Directory points to the dirctory where .feature file is
 Interpreter options: -m behave
+
 ```
 
 ### Building Docker image
@@ -72,14 +69,22 @@ Interpreter options: -m behave
 docker build . -t j9soft/query-files-app-it:latest
 
 # alternatively start in docker
-docker run -e "QFIT_QUERY_FILES_APP_URL=http://localhost:8090"  --name query-files-app--it --rm --network=query-files-app_backend_net -it j9soft/query-files-app-it:latest
+docker run --name query-files-app--it --rm --network=qfa_backend_net -it j9soft/query-files-app-it:latest
 ```
 
 ### Running locally (not from Docker) during development
 
 ```
-QFIT_QUERY_FILES_APP_URL="http://localhost:8090"
+# Connect to s3 provided by localstack (running in docker-compose) 
+QFAIT_AWS_S3_ENDPOINT_URL=http://192.168.99.100:4572
 
+# Connect to query-files-app (running locally via 'flask run')
+QFAIT_QUERY_FILES_APP_URL=http://127.0.0.1:5000
+
+# OR, alternatively, connect to query-files-app running in docker-compose)
+QFAIT_QUERY_FILES_APP_URL=http://192.168.99.100:8000
+
+# Start the integration tests
 behave
 ```
 

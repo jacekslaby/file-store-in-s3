@@ -1,9 +1,46 @@
 import boto3
+import os
 
-# @TODO Read config settings from env variables.
+# Name of environment - For integration tests we always just use the same name.
 environment_name = 'it'
-s3_region_name = 'Dummy'
-s3_endpoint_url = 'http://192.168.99.100:4572'
+
+# Read global config settings from env variables.  (e.g. to have different settings for development and production)
+#
+# - Name of AWS region where s3 buckets should be created
+if 'QFAIT_AWS_S3_REGION_NAME' not in os.environ:
+    # For dev we always just use the same name. (so no need to setup env vars which is troublesome)
+    s3_region_name = 'Dummy'
+else:
+    # For production we configure based on the provided value.
+    # @TODO Is this scenario even used at all ?  Maybe if we want to test against real s3, but... hm...
+    s3_region_name = os.environ['QFAIT_AWS_S3_REGION_NAME']
+#
+# - Location of s3 endpoint
+#   (i.e. an optional environment variable may redefine location of s3 endpoint, e.g. when we use localstack for dev)
+#   (see also:
+#    - https://github.com/aws/aws-cli/issues/1270
+#    - https://clouductivity.com/amazon-web-services/aws-credentials-access-keys-secret-keys/
+#   )
+if 'QFAIT_AWS_S3_ENDPOINT_URL' in os.environ:
+    # For dev we redefine config used by boto3.
+    s3_config = {'endpoint_url': os.environ['QFAIT_AWS_S3_ENDPOINT_URL'],
+                 'use_ssl': False,            # For now we assume it makes sense. (no need to add another env var)
+                 'region_name': 'Dummy',
+                 'aws_access_key_id': 'AccessKey',
+                 'aws_secret_access_key': 'SecretKey'
+                 }
+else:
+    # For production we use defaults. (i.e. boto3 will use defaults)
+    # @TODO Is this scenario even used at all ?  Maybe if we want to test against real s3, but... hm...
+    s3_config = None
+#
+# - Location of query-files-app endpoint
+if 'QFAIT_QUERY_FILES_APP_URL' not in os.environ:
+    # For dev we always just use the localhost. (so no need to setup env vars which is troublesome)
+    query_files_app_url = 'http://127.0.0.1:5000'
+else:
+    # For dev against a docker-compose we configure based on the provided value.
+    query_files_app_url = os.environ['QFAIT_QUERY_FILES_APP_URL']
 
 # Define test data to be created in s3.
 #
@@ -27,11 +64,13 @@ def before_all(context):
     #   https://stackoverflow.com/questions/32618216/overwrite-s3-endpoint-using-boto3-configuration-file
     #   https://stackoverflow.com/questions/48690698/using-boto3-through-sam-local-to-interact-with-localstack-s3
     #   )
-    s3_resource = boto3.resource('s3', endpoint_url=s3_endpoint_url,
-                                 use_ssl=False,
-                                 region_name='Dummy',
-                                 aws_access_key_id='AccessKey',
-                                 aws_secret_access_key='SecertKey')
+    if s3_config is None:
+        # It means we are happy for boto3 to figure out AWS settings. (e.g. from credentials file, IAM role, etc.)
+        s3_resource = boto3.resource('s3')
+    else:
+        # We are on local dev environment and we want to tell boto3 where to connect.
+        s3_resource = boto3.resource('s3', **s3_config)
+
     # Specify the region.
     # (otherwise: "If you don't specify a region, the bucket will be created in US Standard." )
     bucket_configuration = {'LocationConstraint': s3_region_name}
@@ -58,4 +97,9 @@ def before_all(context):
     # provide files in the scenario's context   (e.g. to check correctness of returned results)
     context.files_existing_in_domains = files_existing_in_domains
 
+    # @TODO better logging
     print(files_existing_in_domains)
+
+    # provide a location of the app to be tested
+    context.query_files_app_url = query_files_app_url
+
