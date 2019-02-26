@@ -13,3 +13,20 @@ services:
       - DOCKER_HOST=unix:///var/run/docker.sock
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
+    networks:
+      - qfa_backend_net
+      
+  query-files-app:
+    image: j9soft/query-files-app:0.1.0
+    ports:
+      - "8000:8000"
+    environment:
+      - QFA_ENVIRONMENT_NAME=it
+      - QFA_AWS_S3_ENDPOINT_URL=http://localstack:4572
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    networks:
+      - qfa_backend_net
+      
+networks:
+  qfa_backend_net:
