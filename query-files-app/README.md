@@ -56,9 +56,13 @@ docker run -e "QF_QUERY_FILES_APP_S3_URL=http://192.168.99.100:4572"  --name que
 ### Running locally (not from Docker) during development
 
 ```
-QF_QUERY_FILES_APP_S3_URL=http://192.168.99.100:4572
-
-
+# E.g. in order to connect to a localstack instance running on docker-machine:
+QFA_ENVIRONMENT_NAME=it
+QFA_AWS_S3_ENDPOINT_URL=http://192.168.99.100:4572
+AWS_DEFAULT_REGION=dummy
+AWS_ACCESS_KEY_ID=AccessKeyIfNeeded
+AWS_SECRET_ACCESS_KEY=SecertKeyIfNeeded
+flask run
 ```
 
 ## @TODO
