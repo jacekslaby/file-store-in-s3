@@ -27,11 +27,20 @@ def step_impl(context, domain_regexp):
 
     # Store the returned files in the context for the next steps.
     context.returned_files = r.json()
-    print(context.returned_files)
+
+    # @TODO better logging
+    print(f"Received result from HTTP request to query-files-app: {context.returned_files}")
 
 
 @then(u'I receive "{files_count:Int}" files from domain "{domain_name:Text}"')
 def step_impl(context, files_count, domain_name):
+    # Do we have anything to check?
+    if files_count < 1:
+        return
+
+    # Check whether domain is returned at all
+    assert domain_name in context.returned_files, f"Zero files returned for domain '{domain_name}'"
+
     # Let's remove the selected domain from the result kept in context. (so that other steps do not see it)
     returned_domain_files = context.returned_files.pop(domain_name)
     # Let's assure that domain contained expected number of files.
