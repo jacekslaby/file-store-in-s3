@@ -34,20 +34,20 @@ def step_impl(context, domain_regexp):
 
 @then(u'I receive "{files_count:Int}" files from domain "{domain_name:Text}"')
 def step_impl(context, files_count, domain_name):
-    # Do we have anything to check?
-    if files_count < 1:
-        return
-
     # Domain names in s3 are always lower case.
     s3_domain_name = domain_name.lower()
 
     # Check whether domain is returned at all
-    assert s3_domain_name in context.returned_files, f"Zero files returned for domain '{domain_name}'"
+    assert s3_domain_name in context.returned_files, f"Domain '{domain_name}' was not returned at all"
 
     # Let's remove the selected domain from the result kept in context. (so that other steps do not see it)
     returned_domain_files = context.returned_files.pop(s3_domain_name)
     # Let's assure that domain contained expected number of files.
     assert files_count == len(returned_domain_files)
+
+    if files_count < 1:
+        # Nothing more to check.
+        return
 
     # Let's assure that domain contained expected files.
     expected_files = context.files_existing_in_domains[domain_name]
@@ -57,7 +57,7 @@ def step_impl(context, files_count, domain_name):
             returned_files_set.discard(file_name)
         else:
             raise NotImplementedError(f"@TODO: how to fail ?: Error. File {file_name} was not returned from domain {domain_name}.")
-    # Let's assure that no more files were returned.
+    # Let's assure that no more files were returned for this domain.
     assert 0 == len(returned_files_set), f"Expected: {{}}, Actual: {returned_files_set}"
 
 

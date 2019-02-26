@@ -17,6 +17,7 @@ Feature: Querying for stored files
       When I query for files from domain matching regexp "BP.*"
       Then I receive "4" files from domain "BP-upstream"
        And I receive "10" files from domain "BP-downstream"
+       And I receive "0" files from domain "BP-midstream"
        And I receive no other files
 
   Scenario: User Maria has access to Shell, BP and AL and lists available files
@@ -25,6 +26,7 @@ Feature: Querying for stored files
        And I receive "4" files from domain "BP-upstream"
        And I receive "10" files from domain "BP-downstream"
        And I receive "3" files from domain "AL"
+       And I receive "0" files from domain "BP-midstream"
        And I receive no other files
 
   Scenario: User Nobody has no access and lists available files
