@@ -50,7 +50,9 @@ docker run -it -p 8000:8000 j9soft/query-files-app:latest
 curl http://192.168.99.100:8000/
 
 # alternatively start in docker
-docker run -e "QF_QUERY_FILES_APP_S3_URL=http://192.168.99.100:4572"  --name query-files-appt --rm --network=query-files-app_backend_net -it j9soft/query-files-app:latest
+docker run -it -p 8000:8000 -e "QFA_AWS_S3_ENDPOINT_URL=http://localstack:4572"  --name query-files-app --rm --network=queryfilesappit_qfa_backend_net  j9soft/query-files-app:0.1.0
+docker run -it -p 8000:8000 -e "QFA_AWS_S3_ENDPOINT_URL=http://192.168.99.100:4572"  --name query-files-app --rm   j9soft/query-files-app:0.1.0
+docker run -it -p 8000:8000 -e "QFA_AWS_S3_ENDPOINT_URL=http://192.168.99.100:4572" j9soft/query-files-app:0.1.0
 ```
 
 ### Running locally (not from Docker) during development
