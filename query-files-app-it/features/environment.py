@@ -93,8 +93,9 @@ def before_all(context):
             # Then create all required objects. (in this bucket)
             for object_name in files_list:
                 object = bucket.Object(object_name)
+                object.put(Body='something')     # btw: without put 'Body' object was not created
                 # @TODO better logging
-                print(f"Created object '{object.key}' in bucket '{object.bucket_name}'")
+                print(f"Object '{object.key}' created in bucket '{object.bucket_name}'")
 
         existing_objects = [obj.key for obj in bucket.objects.all()]
         # @TODO better logging
@@ -106,7 +107,7 @@ def before_all(context):
     context.files_existing_in_domains = files_existing_in_domains
 
     # @TODO better logging
-    print(files_existing_in_domains)
+    print(f"Domains with files: {files_existing_in_domains}")
 
     # provide a location of the app to be tested
     context.query_files_app_url = query_files_app_url
