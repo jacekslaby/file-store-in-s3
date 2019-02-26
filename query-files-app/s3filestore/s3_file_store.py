@@ -90,7 +90,8 @@ class S3FileStore:
             # Return nothing for missing regex.
             return {}
 
-        domain_pattern = re.compile(read_domain_regex_str)
+        # Let's ignore case, it is more user friendly.
+        domain_pattern = re.compile(read_domain_regex_str, flags=re.IGNORECASE)
 
         # Filter out buckets not belonging to this environment
         #  and not belonging to the domain regex string.
