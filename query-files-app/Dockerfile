@@ -27,4 +27,4 @@ COPY . /app
 # @TODO Add user.   ("it is not a good practice to run an application as root" - https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-xix-deployment-on-docker-containers )
 # @TODO Add nginx.  (as in "Deploying Gunicorn - We strongly recommend to use Gunicorn behind a proxy server.")
 #
-CMD ["gunicorn"  , "-b", "0.0.0.0:8000", "--log-level=info", "queryfilesapp:app"]
+CMD ["gunicorn"  , "-b", "0.0.0.0:8000", "--access-logfile=-", "--log-level=info", "queryfilesapp:app"]
