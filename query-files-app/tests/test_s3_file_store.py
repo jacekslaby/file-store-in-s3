@@ -19,7 +19,6 @@ def setup_test_data():
         map_domain_bucket[domain_name_str] = generate_bucket_name(domain_name_str, i)
 
     test_bucket_names = map_domain_bucket.values()
-    print(map_domain_bucket)
 
     def generate_expected(*domain_name_args):
         result = {}
