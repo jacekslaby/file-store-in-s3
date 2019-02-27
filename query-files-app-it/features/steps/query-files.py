@@ -1,5 +1,6 @@
 from behave import *
 import requests
+from urllib.parse import quote
 
 # https://jenisys.github.io/behave.example/tutorials/tutorial10.html
 #
@@ -18,12 +19,15 @@ def step_impl(context, files_count, domain_name):
     assert files_count == len(context.files_existing_in_domains[domain_name])
 
 
-@when(u'I query for files from domain matching regexp "{domain_regexp:Text}"')
-def step_impl(context, domain_regexp):
+@when(u'I query for files from domain matching regexp "{domain_regex:Text}"')
+def step_impl(context, domain_regex):
     # Let's load files matching domain regexp.
-    url = context.query_files_app_url + '/v1/files?read_domain_regex=' + domain_regexp
+    url = context.query_files_app_url + '/v1/files?read_domain_regex=' + quote(domain_regex, safe='')
     r = requests.get(url)
     r.raise_for_status()
+
+    # Store the domain regex in the context for the next steps.
+    context.domain_regex = domain_regex
 
     # Store the returned files in the context for the next steps.
     context.returned_files = r.json()
