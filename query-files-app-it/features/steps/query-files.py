@@ -28,7 +28,6 @@ def step_impl(context, domain_regexp):
     # Store the returned files in the context for the next steps.
     context.returned_files = r.json()
 
-    # @TODO better logging
     print(f"Received result from HTTP request to query-files-app: {context.returned_files}")
 
 
@@ -42,10 +41,8 @@ def step_impl(context, files_count, domain_name):
 
     # Let's remove the selected domain from the result kept in context. (so that other steps do not see it)
     returned_domain_files = context.returned_files.pop(s3_domain_name)
-    # Let's assure that domain contained expected number of files.
-    assert files_count == len(returned_domain_files)
 
-    if files_count < 1:
+    if files_count < 1 and 0 == len(returned_domain_files):
         # Nothing more to check.
         return
 
@@ -56,12 +53,14 @@ def step_impl(context, files_count, domain_name):
         if file_name in returned_files_set:
             returned_files_set.discard(file_name)
         else:
-            raise NotImplementedError(f"@TODO: how to fail ?: Error. File {file_name} was not returned from domain {domain_name}.")
-    # Let's assure that no more files were returned for this domain.
-    assert 0 == len(returned_files_set), f"Expected: {{}}, Actual: {returned_files_set}"
+            assert False, f"File {file_name} was expected and it was not returned, for domain {domain_name}."
+
+    # Let's assure that no more files were returned for this domain. (i.e. that returned_files_set is empty)
+    assert set() == returned_files_set, f"Not expected additional files were returned: {returned_files_set}"
 
 
 @then(u'I receive no other files')
 def step_impl(context):
-    # Let's check that we have processed all the returned files, i.e. there is no domain in the result kept in context.
-    assert 0 == len(context.returned_files.keys()), f"Expected: {{}}, Actual: {context.returned_files}"
+    # Let's check that we have processed all the returned files,
+    #  i.e. check that there is no domain left in the result kept in the context.
+    assert {} == context.returned_files, f"Not expected additional domains were returned: {context.returned_files}"

@@ -47,11 +47,11 @@ else:
 # Let's provide domains names. Each with number of files.
 domains = {'Shell': 2, 'BP-upstream': 4, 'BP-midstream': 0, 'BP-downstream': 10, 'AL': 3, 'CA': 2}
 #
-# Let's create file names for every domain, e.g. 'Shell:0', 'Shell:1', etc.
+# Let's prepare file names for every domain, e.g. 'Shell:0', 'Shell:1', etc.
 files_existing_in_domains = {domain_name: [domain_name + ':' + str(i) for i in range(file_count)]
                              for domain_name, file_count in domains.items()}
 #
-# Let's create bucket names, e.g. bucket 'it::Shell' with files ['Shell:0', 'Shell:1']
+# Let's prepare bucket names, e.g. bucket 'it::Shell' with files ['Shell:0', 'Shell:1']
 files_existing_in_s3_buckets = {environment_name + '--' + domain_name + '--unique-uuid': files_list
                                 for domain_name, files_list in files_existing_in_domains.items()}
 
