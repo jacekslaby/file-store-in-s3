@@ -1,7 +1,7 @@
 from s3filestore import S3FileStore
 import pytest
 
-# Data used to create scenarios, i.e. to create inputs and expected results.
+# Data used to create test scenarios, i.e. to create inputs and expected results.
 environment_name = 'it'
 test_domain_names = ['shell', 'statoil', 'ca', 'bp-upstream', 'bp-downstream']
 
@@ -14,19 +14,20 @@ def setup_test_data():
         return environment_name + S3FileStore.NAME_SEPARATOR + domain_name\
                + S3FileStore.NAME_SEPARATOR + str(domain_unique_suffix)
 
-    map_domain_bucket = {}
+    map_domain_to_bucket = {}
     for i, domain_name_str in enumerate(test_domain_names):
-        map_domain_bucket[domain_name_str] = generate_bucket_name(domain_name_str, i)
+        map_domain_to_bucket[domain_name_str] = generate_bucket_name(domain_name_str, i)
 
-    test_bucket_names = map_domain_bucket.values()
+    test_bucket_names = map_domain_to_bucket.values()
 
     def generate_expected(*domain_name_args):
         result = {}
         for domain_name in domain_name_args:
-            result[domain_name] = map_domain_bucket[domain_name]
+            result[domain_name] = map_domain_to_bucket[domain_name]
         return result
 
     return [
+        # every tuple contains: (all_buckets_names, read_domain_regex_str, expected_mapping_of_domains_to_buckets)
         ([], 'dummy', {}),                                           # Scenario: no buckets exist in s3
         (test_bucket_names, 'shell', generate_expected('shell')),    # Scenario: user with access to 'shell' domain
         (test_bucket_names, 'shell.*', generate_expected('shell')),  # Scenario: user with access to 'shell' domains
@@ -38,7 +39,8 @@ def setup_test_data():
     ]
 
 
-# Variable containing test scenarios to be iterated by unit tests framework.
+# Variable containing test scenarios to be iterated by unit tests framework
+#   when testing method _get_domains_with_buckets().
 test_data_for_get_domains_with_buckets = setup_test_data()
 
 
@@ -63,5 +65,5 @@ def test_get_domains_with_buckets(s3_file_store, all_buckets_names, read_domain_
 
 # Note: It makes little sense to add unit tests for the remaining methods of class S3FileStore,
 #  because their logic is very simple and very dependent on boto3 and access to s3.
-#  So, testing them would require a lot of mocking. (too much mocking means too much maintenance)
-#  Better approach is to assume that integration tests (from query-files-app-it) do the verification anyway.
+#  So, testing them would require a lot of mocking. (and too much mocking means too much maintenance)
+#  Better approach is to assume that integration tests (from module query-files-app-it) do the verification anyway.
