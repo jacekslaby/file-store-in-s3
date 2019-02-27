@@ -1,31 +1,27 @@
 # Query Files App (Integration Tests)
 
-This module provides a logic to execute Integration Tests (IT) of query-files-app. (i.e. the Query part from CQRS, for File-Store-in-S3 application.)
-Using docker-compose it sets up:
-- s3 local server (i.e. mock/stub) (@todo  https://stackoverflow.com/questions/6615988/how-to-mock-amazon-s3-in-an-integration-test)
-- tested instance of query-files-app.
+This module provides a logic to execute Integration Tests (IT) of query-files-app.
 
-Afterwards it runs end-to-end scenarios defined in behave (BDD).
+Using docker-compose it sets up services:
+- localhost - an s3 local server (i.e. a mock/stub) 
+    - (see also: https://stackoverflow.com/questions/6615988/how-to-mock-amazon-s3-in-an-integration-test)
+- query-files-app - a tested instance of query-files-app.
+
+Afterwards it is possible to run end-to-end scenarios defined in Gherkin (BDD+`behave`).
 
 ## Getting Started
 
 ```
 # Create dev environment.
 #
-$ mkvirtualenv file-store-in-s3 --python=python3
+$ cd file-store-in-s3/query-files-app-it
+$ mkvirtualenv venv --python=python3
 
 # Install dependencies.
 $ cd file-store-in-s3/query-files-app-it
 (file-store-in-s3) $ pip install -r requirements.txt
 
-
-(file-store-in-s3) $ cd file-store-in-s3/query-files-app-it
-(file-store-in-s3) $ pip install behave
-(file-store-in-s3) $ pip freeze > requirements.txt
-
-
 @TODO
-
 # Build images of modules: (and put them in the local docker)
 #  query-files-app          - app to be tested
 #  query-files-app-it       - integration tests
@@ -35,6 +31,7 @@ $ run_on_local_docker__install_all_images.sh
 $ docker image ls
 REPOSITORY                         TAG                  IMAGE ID            CREATED             SIZE
 
+@TODO
 # Start Up the required containers and run ITs.
 #
 $ run_on_local_docker__run_all_it.sh 
@@ -60,7 +57,6 @@ Add Run configuration as described here: https://stackoverflow.com/questions/158
 Script: put dot (.) in here [this way PyCharm recognizes the configuration as valid and doesn't show red cross mark]
 Working Directory points to the dirctory where .feature file is
 Interpreter options: -m behave
-
 ```
 
 ### Building Docker image
@@ -75,13 +71,12 @@ docker run --name query-files-app--it --rm --network=qfa_backend_net -it j9soft/
 ### Running locally (not from Docker) during development
 
 ```
-# Connect to s3 provided by localstack (running in docker-compose) 
+# Connect to s3 provided by localstack (running in docker-compose on a docker-machine) 
 QFAIT_AWS_S3_ENDPOINT_URL=http://192.168.99.100:4572
 
 # Connect to query-files-app (running locally via 'flask run')
 QFAIT_QUERY_FILES_APP_URL=http://127.0.0.1:5000
-
-# OR, alternatively, connect to query-files-app running in docker-compose)
+# OR, alternatively, connect to query-files-app running in docker-compose on a docker-machine)
 QFAIT_QUERY_FILES_APP_URL=http://192.168.99.100:8000
 
 # Start the integration tests
