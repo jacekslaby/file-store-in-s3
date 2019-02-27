@@ -1,4 +1,5 @@
-from s3filestore import S3FileStore
+from s3filestore.query_files import _get_domains_with_buckets
+from s3filestore.query_files import NAME_SEPARATOR
 import pytest
 
 # Data used to create test scenarios, i.e. to create inputs and expected results.
@@ -11,8 +12,8 @@ def setup_test_data():
     """return a list containing tuples where each tuple represents a single test scenario"""
 
     def generate_bucket_name(domain_name, domain_unique_suffix):
-        return environment_name + S3FileStore.NAME_SEPARATOR + domain_name\
-               + S3FileStore.NAME_SEPARATOR + str(domain_unique_suffix)
+        return environment_name + NAME_SEPARATOR + domain_name\
+               + NAME_SEPARATOR + str(domain_unique_suffix)
 
     map_domain_to_bucket = {}
     for i, domain_name_str in enumerate(test_domain_names):
@@ -44,12 +45,6 @@ def setup_test_data():
 test_data_for_get_domains_with_buckets = setup_test_data()
 
 
-@pytest.fixture()
-def s3_file_store():
-    """create a new tested instance for each run of a test_* method"""
-    return S3FileStore()
-
-
 # Unit tests of a single method:  _get_domains_with_buckets(...)
 # Testing is done using several input scenarios,
 #   i.e. there are many runs of the tested method,
@@ -57,13 +52,13 @@ def s3_file_store():
 # (see also https://docs.pytest.org/en/latest/example/parametrize.html#paramexamples )
 #
 @pytest.mark.parametrize("all_buckets_names, read_domain_regex_str, expected", test_data_for_get_domains_with_buckets)
-def test_get_domains_with_buckets(s3_file_store, all_buckets_names, read_domain_regex_str, expected):
+def test_get_domains_with_buckets(all_buckets_names, read_domain_regex_str, expected):
 
-    result = s3_file_store._get_domains_with_buckets(all_buckets_names, read_domain_regex_str)
+    result = _get_domains_with_buckets(environment_name, all_buckets_names, read_domain_regex_str)
     assert result == expected
 
 
-# Note: It makes little sense to add unit tests for the remaining methods of class S3FileStore,
+# Note: It makes little sense to add unit tests for the remaining methods of module query_files,
 #  because their logic is very simple and very dependent on boto3 and access to s3.
 #  So, testing them would require a lot of mocking. (and too much mocking means too much maintenance)
 #  Better approach is to assume that integration tests (from module query-files-app-it) do the verification anyway.

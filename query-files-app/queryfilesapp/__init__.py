@@ -14,10 +14,13 @@ else:
     # (see also: https://medium.com/@trstringer/logging-flask-and-gunicorn-the-manageable-way-2e6f0b8beb2f )
     gunicorn_logger = logging.getLogger('gunicorn.error')
 
-    # Configure logger from s3filestore lib to follow gunicorn level and handlers.
-    s3_file_store_logger = logging.getLogger('s3filestore.s3_file_store')
-    s3_file_store_logger.handlers = gunicorn_logger.handlers
-    s3_file_store_logger.setLevel(gunicorn_logger.level)
+    # Configure loggers from s3filestore lib to follow gunicorn level and handlers.
+    for module_logger in (
+            logging.getLogger('s3filestore.s3_file_store'),
+            logging.getLogger('s3filestore.query_files')
+    ):
+        module_logger.handlers = gunicorn_logger.handlers
+        module_logger.setLevel(gunicorn_logger.level)
 
 
 # Setup file store. (Note: It must be after logging setup, otherwise messages are missing.)
