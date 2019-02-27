@@ -13,6 +13,8 @@ RUN pip install -r requirements-in-container.txt
 EXPOSE 8000
 
 # Copy our application code.
+# (Note: We use 'COPY .' because we need to copy files _including_ their folders.
+#   We use file .dockerignore in order to avoid unwanted files, e.g. virtualenv stack and tests.)
 #
 COPY . /app
 
