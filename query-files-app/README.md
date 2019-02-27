@@ -42,6 +42,20 @@ export FLASK_ENV=development
 flask run
 ```
 
+#### Running in PyCharm
+
+1. Using python (better, because log messages are better formatted)
+    * Add 'Run' configuration 
+    * with 'Script path' pointing to `...\query-files-app\queryfilesapp\__init__.py`
+    * and with env variables:
+        * FLASK_APP=queryfilesapp
+        * QFA_AWS_S3_ENDPOINT_URL=http://192.168.99.100:4572
+ 
+2. Using flask
+    * Add 'Run' configuration 
+    * with 'Script path' pointing to `...\file-store-in-s3\query-files-app\venv\Scripts\flask.exe` (in your virtualenv)
+    * and with the same env variables as in 1.
+
 ### Building Docker image
 
 ```

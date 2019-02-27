@@ -33,9 +33,9 @@ else:
     # For production we use defaults. (i.e. boto3 will use defaults)
     s3_config = None
 
-# @TODO better logging
-logger.warning("S3FileStore global config: environment_name = '%s'", environment_name)
-logger.warning("S3FileStore global config: s3_config = '%s'", s3_config)
+# Let's log global config settings.
+logger.info("S3FileStore global config: environment_name = '%s'", environment_name)
+logger.info("S3FileStore global config: s3_config = '%s'", s3_config)
 
 
 class S3FileStore:
@@ -79,7 +79,7 @@ class S3FileStore:
 
         # Every time we need to read available buckets. (because admin could add/remove some buckets in the meantime)
         result = [bucket.name for bucket in self.s3_resource.buckets.all()]
-        logger.warning("S3FileStore: _get_all_buckets_names = '%s'", result)
+        logger.info("S3FileStore: _get_all_buckets_names = '%s'", result)
 
         return result
 
@@ -103,7 +103,6 @@ class S3FileStore:
                 domain_name_start_position = len(environment_name) + len(S3FileStore.NAME_SEPARATOR)
                 domain_name_end_position = bucket_name.find(S3FileStore.NAME_SEPARATOR, domain_name_start_position)
                 if domain_name_end_position < 0:
-                    # @TODO add better logging
                     logger.warning(f'Unsupported bucket encountered: "{bucket_name}'
                                    f'" - expected format is like "<environment>--<domain name>--<uuid>".')
                     continue
@@ -114,7 +113,7 @@ class S3FileStore:
                 if domain_pattern.match(domain_name):
                     result[domain_name] = bucket_name
 
-        logger.warning("S3FileStore: _get_domains_with_buckets = '%s'", result)
+        logger.info("S3FileStore: _get_domains_with_buckets = '%s'", result)
         return result
 
     def _get_file_names_from_objects(self, domains_with_buckets):
@@ -130,5 +129,5 @@ class S3FileStore:
             domain_file_names = [obj.key for obj in bucket.objects.all()]
             result[domain_name] = domain_file_names
 
-        logger.warning("S3FileStore: _get_file_names_from_objects = '%s'", result)
+        logger.info("S3FileStore: _get_file_names_from_objects = '%s'", result)
         return result

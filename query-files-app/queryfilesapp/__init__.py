@@ -1,9 +1,38 @@
+import logging
 from flask import Flask, jsonify, request
-from s3filestore import S3FileStore
 
 app = Flask(__name__)
+
+# Setup our logging.
+if __name__ == '__main__':
+    # During development let's include messages from our logger(s) in the output.
+    # (see also: http://flask.pocoo.org/docs/dev/logging/ )
+    from flask.logging import default_handler
+    root = logging.getLogger()
+    root.addHandler(default_handler)
+    root.setLevel(logging.INFO)
+else:
+    # On production let's align logging with settings given to Gunicorn.
+    # (see also: https://medium.com/@trstringer/logging-flask-and-gunicorn-the-manageable-way-2e6f0b8beb2f )
+    gunicorn_logger = logging.getLogger('gunicorn.error')
+
+    # Configure logger from s3filestore lib to follow gunicorn level and handlers.
+    s3_file_store_logger = logging.getLogger('s3filestore.s3_file_store')
+    s3_file_store_logger.handlers = gunicorn_logger.handlers
+    s3_file_store_logger.setLevel(gunicorn_logger.level)
+
+    # @TODO Is it required ?  (as app.logger is not used then perhaps we can remove these 2 lines ?)
+    app.logger.handlers = gunicorn_logger.handlers
+    app.logger.setLevel(gunicorn_logger.level)
+
+
+# Setup our file store. (Note: It must be after logging setup, otherwise messages are missing.)
+from s3filestore import S3FileStore
 s3_file_store = S3FileStore()
 
+
+# Let's setup our web app logic.
+#
 
 def bad_request(message):
     # (see also:
