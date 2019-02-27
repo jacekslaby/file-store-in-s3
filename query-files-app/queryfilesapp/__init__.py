@@ -1,9 +1,7 @@
 import logging
 from flask import Flask, jsonify, request
 
-app = Flask(__name__)
-
-# Setup our logging.
+# Setup logging.
 if __name__ == '__main__':
     # During development let's include messages from our logger(s) in the output.
     # (see also: http://flask.pocoo.org/docs/dev/logging/ )
@@ -22,13 +20,15 @@ else:
     s3_file_store_logger.setLevel(gunicorn_logger.level)
 
 
-# Setup our file store. (Note: It must be after logging setup, otherwise messages are missing.)
+# Setup file store. (Note: It must be after logging setup, otherwise messages are missing.)
 from s3filestore import S3FileStore
 s3_file_store = S3FileStore()
 
 
-# Let's setup our web app logic.
+# Setup web app.
 #
+app = Flask(__name__)
+
 
 def bad_request(message):
     # (see also:
@@ -37,11 +37,6 @@ def bad_request(message):
     response = jsonify({'message': message})
     response.status_code = 400
     return response
-
-
-@app.route('/')
-def hello():
-    return 'Hello, World!'
 
 
 # Example: http://127.0.0.1:5000/v1/files?read_domain_regex=shell
