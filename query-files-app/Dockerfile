@@ -1,15 +1,20 @@
 FROM python:3.7.2
 
-COPY . /app
+COPY requirements-in-container.txt /app/
 
 WORKDIR /app
 
-# Install modules required by our flask app (from requirements.txt)
-#  and modules required by our deployment method (from requirements-in-container.txt).
+# Install modules required by our flask app (BUT not from requirements.txt, which contains too much, e.g. test libs)
+#  and modules required by our deployment method.
 #
-RUN pip install -r requirements.txt  &&  pip install -r requirements-in-container.txt
+RUN pip install -r requirements-in-container.txt
 
+# WSGI HTTP Server will be exposed on this port.
 EXPOSE 8000
+
+# Copy our application code.
+#
+COPY . /app
 
 # Run WSGI HTTP Server serving our app.
 #
@@ -22,4 +27,4 @@ EXPOSE 8000
 # @TODO Add user.   ("it is not a good practice to run an application as root" - https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-xix-deployment-on-docker-containers )
 # @TODO Add nginx.  (as in "Deploying Gunicorn - We strongly recommend to use Gunicorn behind a proxy server.")
 #
-CMD ["gunicorn"  , "-b", "0.0.0.0:8000", "queryfilesapp:app"]
+CMD ["gunicorn"  , "-b", "0.0.0.0:8000", "--log-level=info", "queryfilesapp:app"]

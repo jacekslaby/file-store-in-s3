@@ -1,8 +1,11 @@
-venv
-__pycache__
-*.pyc
-.pytest_cache
-tests
 .idea
+.pytest_cache
+__pycache__
+tests
+venv
+tests
 .dockerignore
+conftest.py
 Dockerfile
+requirements.txt
+*.pyc
