@@ -21,10 +21,6 @@ else:
     s3_file_store_logger.handlers = gunicorn_logger.handlers
     s3_file_store_logger.setLevel(gunicorn_logger.level)
 
-    # @TODO Is it required ?  (as app.logger is not used then perhaps we can remove these 2 lines ?)
-    app.logger.handlers = gunicorn_logger.handlers
-    app.logger.setLevel(gunicorn_logger.level)
-
 
 # Setup our file store. (Note: It must be after logging setup, otherwise messages are missing.)
 from s3filestore import S3FileStore
