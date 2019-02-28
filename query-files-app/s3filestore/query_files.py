@@ -3,11 +3,15 @@
 
 import re
 import logging
+from collections import namedtuple
 
 _logger = logging.getLogger(__name__)
 
 # Separator used in bucket name, e.g. <environment>--<domain>--<UUID> = testenv--shell--234666
 _NAME_SEPARATOR = '--'
+
+# Define namedtuple to be used when returning result from get_bucket_for_domain().
+S3Bucket = namedtuple('S3Bucket', ['name', 'object_names'])
 
 
 def get_domains_with_files(s3_resource, environment_name, read_domain_regex_str):
@@ -35,7 +39,7 @@ def _get_all_buckets_names(s3_resource):
 
     # Every time we need to read available buckets. (because admin could add/remove some buckets in the meantime)
     result = [bucket.name for bucket in s3_resource.buckets.all()]
-    _logger.info("S3FileStore: _get_all_buckets_names = '%s'", result)
+    _logger.info("_get_all_buckets_names = '%s'", result)
 
     return result
 
@@ -61,7 +65,7 @@ def _get_domains_with_buckets(environment_name, all_buckets_names, read_domain_r
             domain_name_end_position = bucket_name.find(_NAME_SEPARATOR, domain_name_start_position)
             if domain_name_end_position < 0:
                 _logger.warning(f'Unsupported bucket encountered: "{bucket_name}'
-                               f'" - expected format is like "<environment>--<domain name>--<uuid>".')
+                                f'" - expected format is like "<environment>--<domain name>--<uuid>".')
                 continue
 
             domain_name = bucket_name[domain_name_start_position:domain_name_end_position]
@@ -70,7 +74,7 @@ def _get_domains_with_buckets(environment_name, all_buckets_names, read_domain_r
             if domain_pattern.match(domain_name):
                 result[domain_name] = bucket_name
 
-    _logger.info("S3FileStore: _get_domains_with_buckets = '%s'", result)
+    _logger.info("_get_domains_with_buckets = '%s'", result)
     return result
 
 
@@ -87,5 +91,41 @@ def _get_domains_with_file_names(s3_resource, domains_with_buckets):
         domain_file_names = [obj.key for obj in bucket.objects.all()]
         result[domain_name] = domain_file_names
 
-    _logger.info("S3FileStore: _get_domains_with_file_names = '%s'", result)
+    _logger.info("_get_domains_with_file_names = '%s'", result)
+    return result
+
+
+def get_bucket_for_domain(s3_resource, environment_name, read_domain_regex_str, domain_name):
+    """Get s3 bucket name for the specified domain.
+
+       From s3 retrieves domains matching the read_domain_regex_str and existing in the specified environment.
+       If the specified domain is among them then returns its name of its s3 bucket.
+
+       Returns a string name of an s3 bucket."""
+
+    if read_domain_regex_str is None:
+        # Return nothing for missing regex.
+        return {}
+
+    # @TODO Add more efficient privileges checking. (If user has access
+    #   then it is possible to find it without calculating _all_ the buckets.)
+
+    # Find all existing buckets.
+    all_buckets_names = _get_all_buckets_names(s3_resource)
+
+    # Find all matching domains with their respective s3 buckets.
+    domains_with_buckets = _get_domains_with_buckets(environment_name, all_buckets_names, read_domain_regex_str)
+
+    bucket_name = domains_with_buckets.get(domain_name)
+
+    # Returns None if domain does not exist. (or when user has no privileges to it)
+    result = None
+
+    if bucket_name:
+        bucket = s3_resource.Bucket(bucket_name)
+        object_names = [obj.key for obj in bucket.objects.all()]
+        result = S3Bucket(name=bucket_name, object_names=object_names)
+
+    _logger.info("get_bucket_for_domain = '%s'", result)
+
     return result

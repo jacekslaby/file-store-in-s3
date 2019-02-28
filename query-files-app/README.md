@@ -28,8 +28,6 @@ pip install -r requirements.txt
 ```
 (query-files-app) $ cd file-store-in-s3/query-files-app
 pytest
-
-http://127.0.0.1:5000/v1/domains?read_domain_regex=shell
 ```
 
 ### Running
@@ -40,6 +38,9 @@ http://flask.pocoo.org/docs/1.0/tutorial/factory/
 export FLASK_APP=query-files-app
 export FLASK_ENV=development
 flask run
+
+http://127.0.0.1:5000/v1/domains?read_domain_regex=shell
+http://127.0.0.1:5000/v1/file-download?read_domain_regex=shell&domain_name=Shell&file_name=Shell%3A0
 ```
 
 #### Running in PyCharm
@@ -83,4 +84,3 @@ flask run
 
 ## @TODO
 
-- create the first skeleton of the app

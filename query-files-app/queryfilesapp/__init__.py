@@ -1,7 +1,7 @@
 """Package contains a flask app which provides HTTP based read access to domains and files kept in s3."""
 
 import logging
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, abort
 
 # Setup logging.
 if __name__ == '__main__':
@@ -25,7 +25,7 @@ else:
         module_logger.setLevel(gunicorn_logger.level)
 
 
-# Setup file store. (Note: It must be after logging setup, otherwise messages are missing.)
+# Setup file store. (Note: It must be done after logging setup, otherwise messages are missing.)
 from s3filestore import S3FileStore
 s3_file_store = S3FileStore()
 
@@ -36,12 +36,28 @@ app = Flask(__name__)
 
 
 def bad_request(message):
+    """Builds and returns an HTTP 400 response containing the message."""
+
     # (see also:
     #  https://stackoverflow.com/questions/21294889/how-to-get-access-to-error-message-from-abort-command-when-using-custom-error-ha
     #
     response = jsonify({'message': message})
     response.status_code = 400
     return response
+
+
+def extract_param_from_request(param_name, request_args):
+    """Extracts value of a parameter by its name. Returns it as str. Throws ValueError if parameter not found."""
+
+    # ( see:
+    #   https://stackoverflow.com/questions/15182696/multiple-parameters-in-in-flask-approute
+    #   http://flask.pocoo.org/docs/1.0/patterns/jquery/ )
+    param_value = request_args.get(param_name)
+
+    if param_value is None:
+        raise ValueError(f"Missing required query parameter '{param_name}' in request URL.")
+
+    return param_value
 
 
 @app.route('/v1/domains')
@@ -52,16 +68,14 @@ def get_domains_with_files():
      where key is a domain name (string)
      and value is a list of files names (strings).
 
-     Example: http://127.0.0.1:5000/v1/domains?read_domain_regex=shell
+    Example: http://127.0.0.1:5000/v1/domains?read_domain_regex=shell
     """
 
-    # Extract regex for domains from URL parameter.
-    # ( https://stackoverflow.com/questions/15182696/multiple-parameters-in-in-flask-approute
-    #   http://flask.pocoo.org/docs/1.0/patterns/jquery/ )
-    param_name = 'read_domain_regex'
-    arg_read_domain_regex = request.args.get(param_name)
-    if arg_read_domain_regex is None:
-        return bad_request(f"Missing required query parameter '{param_name}' in request URL.")
+    # Extract input parameters from URL.
+    try:
+        arg_read_domain_regex = extract_param_from_request('read_domain_regex', request.args)
+    except ValueError as e:
+        return bad_request(str(e))
 
     # Retrieve matching domains with files.
     files = s3_file_store.get_domains_with_files(arg_read_domain_regex)
@@ -69,6 +83,32 @@ def get_domains_with_files():
     return jsonify(files)
 
 
+@app.route('/v1/file-download')
+def get_file_download():
+    """Retrieves a file-download object with properties to be used by a client to launch a download operation.
+
+    Returns a JSON object containing {'download_url': '<URL to be used>'}.
+
+    http://127.0.0.1:5000/v1/file-download?read_domain_regex=shell&domain_name=Shell&file_name=Shell%3A0
+    """
+
+    # Extract input parameters from URL.
+    try:
+        arg_read_domain_regex = extract_param_from_request('read_domain_regex', request.args)
+        domain_name = extract_param_from_request('domain_name', request.args)
+        file_name = extract_param_from_request('file_name', request.args)
+    except ValueError as e:
+        return bad_request(str(e))
+
+    # Retrieve file-download.
+    file_download = s3_file_store.get_file_download(arg_read_domain_regex, domain_name, file_name)
+
+    if file_download:
+        return jsonify(file_download)
+    else:
+        # Return 404 Not Found
+        return abort(404)
+
+
 if __name__ == "__main__":
     app.run(debug=True)
-

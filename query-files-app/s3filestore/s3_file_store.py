@@ -4,8 +4,10 @@ import boto3
 import os
 import logging
 from s3filestore.query_files import get_domains_with_files
+from s3filestore.query_files import get_bucket_for_domain
+from s3filestore.download_files import get_file_download
 
-logger = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 # Read global config settings from env variables.  (e.g. to have different settings for development and production)
 #
@@ -36,8 +38,8 @@ else:
     s3_config = None
 
 # Let's log global config settings.
-logger.info("S3FileStore global config: environment_name = '%s'", environment_name)
-logger.info("S3FileStore global config: s3_config = '%s'", s3_config)
+_logger.info("S3FileStore global config: environment_name = '%s'", environment_name)
+_logger.info("S3FileStore global config: s3_config = '%s'", s3_config)
 
 
 class S3FileStore:
@@ -52,12 +54,31 @@ class S3FileStore:
         if s3_config is None:
             # It means we are happy for boto3 to figure out AWS settings. (e.g. from credentials file, IAM role, etc.)
             self.s3_resource = boto3.resource('s3')
+            self.s3_client = boto3.client('s3')
         else:
             # We are on local dev environment and we want to tell boto3 where to connect.
             self.s3_resource = boto3.resource('s3', **s3_config)
+            self.s3_client = boto3.client('s3', **s3_config)
 
     def get_domains_with_files(self, read_domain_regex_str):
         """retrieves domains (with files) matching regex.
            Returns a dict containing domain names as keys and lists of file names as values."""
 
         return get_domains_with_files(self.s3_resource, environment_name, read_domain_regex_str)
+
+    def get_file_download(self, read_domain_regex_str, domain_name, file_name):
+        """retrieves a file-download object containing properties to be used by a client to launch a download operation.
+
+           Returns a dict containing {'download_url': '<URL to be used>'}.
+           Returns None if domain or file do not exist.
+           Returns None if user does not have privileges to the file."""
+
+        target_s3bucket = get_bucket_for_domain(self.s3_resource, environment_name, read_domain_regex_str, domain_name)
+
+        if target_s3bucket:
+            _logger.info("S3FileStore get_file_download: file_name = '%s', target_s3bucket.object_names = '%s'",
+                         file_name, target_s3bucket.object_names)
+            if file_name in target_s3bucket.object_names:
+                return get_file_download(self.s3_client, target_s3bucket.name, file_name)
+
+        return None
