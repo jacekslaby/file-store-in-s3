@@ -105,7 +105,7 @@ def get_bucket_for_domain(s3_resource, environment_name, read_domain_regex_str, 
 
     if read_domain_regex_str is None:
         # Return nothing for missing regex.
-        return {}
+        return None
 
     # @TODO Add more efficient privileges checking. (If user has access
     #   then it is possible to find it without calculating _all_ the buckets.)
