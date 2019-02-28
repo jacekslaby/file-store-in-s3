@@ -13,37 +13,39 @@ $ mkvirtualenv query-files-app  --python=python3
 (query-files-app) $ cd file-store-in-s3/query-files-app
 pip install -r requirements.txt
 
+# Run from the command line.
+# (see also http://flask.pocoo.org/docs/1.0/tutorial/factory/)
+#
+# (Note: It connects to AWS S3, so your credentials need to available in a standard way,
+#   e.g. env variables or a .credentials file.)
+#
+(query-files-app) $ cd file-store-in-s3/query-files-app
+export FLASK_APP=query-files-app
+export FLASK_ENV=development
+flask run
 
+# Open Web Browser with:
+http://127.0.0.1:5000/v1/domains?read_domain_regex=shell
+http://127.0.0.1:5000/v1/file-download?read_domain_regex=shell&domain_name=Shell&file_name=Shell%3A0
 ```
+
 
 ## Developing
 
 ### Adding dependencies
+```
 (query-files-app) $ cd file-store-in-s3/query-files-app
 (query-files-app) $ pip install flask
 (query-files-app) $ pip freeze  | grep -v 'pkg-resources==0.0.0' > requirements.txt
-
-### Unit tests
+```
+### Running unit tests
 
 ```
 (query-files-app) $ cd file-store-in-s3/query-files-app
 pytest
 ```
 
-### Running
-
-http://flask.pocoo.org/docs/1.0/tutorial/factory/
-```
-(query-files-app) $ cd file-store-in-s3/query-files-app
-export FLASK_APP=query-files-app
-export FLASK_ENV=development
-flask run
-
-http://127.0.0.1:5000/v1/domains?read_domain_regex=shell
-http://127.0.0.1:5000/v1/file-download?read_domain_regex=shell&domain_name=Shell&file_name=Shell%3A0
-```
-
-#### Running in PyCharm
+### Running App in PyCharm
 
 1. Using python (better, because log messages are better formatted)
     * Add 'Run' configuration 
