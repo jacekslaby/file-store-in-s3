@@ -14,8 +14,8 @@ Each module resides in its own subfolder.
 | Modules                                       | Description 
 | ------------------------------------------ | -------------------------------------------------------------------------------- 
 | [doc](doc/README.md)     | Design documentation for File-Store-in-s3 application.
-| [query-files-app](query-files-app/README.md)     | Query-Files-App is a web application (HTTP) developed in `python`+`flask`+`Gunicorn`+`Docker`.
-| [query-files-app-it](query-files-app-it/README.md)     | Integration Tests (IT) of Query-Files-App. Using docker-compose it sets up a localstack, several s3 buckets and objects, an instance of Query-Files-App and then runs end-to-end BDD scenarios defined in Gherkin and implemented in `python`+`behave`.
+| [query-files-app](query-files-app/README.md)     | Query-Files-App is a web application (HTTP). Developed in `python`+`flask`+`Gunicorn`+`Docker`.
+| [query-files-app-it](query-files-app-it/README.md)     | Integration Tests (IT) of Query-Files-App. Using docker-compose it sets up a `localstack` instance, several s3 buckets and objects, an instance of Query-Files-App and then runs end-to-end BDD scenarios. The scenarios are defined in Gherkin and implemented in `python`+`behave`.
 
 
 # Running The Modules
@@ -31,5 +31,5 @@ Each module resides in its own subfolder.
 
 # @TODO
 
-* module file-store-gui
+* module: file-store-gui
 * modules: command-files-app + command-files-app-it
