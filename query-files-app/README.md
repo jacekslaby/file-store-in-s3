@@ -63,9 +63,9 @@ pytest
 ### Building Docker image
 
 ```
-docker build . -t j9soft/query-files-app:latest
-docker run -it -p 8000:8000 j9soft/query-files-app:latest
-curl http://192.168.99.100:8000/
+docker build . -t j9soft/query-files-app:0.1.0
+docker run -it -p 8000:8000 j9soft/query-files-app:0.1.0
+curl http://192.168.99.100:8000/v1/domains?read_domain_regex=shell
 
 # alternatively start in docker
 docker run -it -p 8000:8000 -e "QFA_AWS_S3_ENDPOINT_URL=http://localstack:4572"  --name query-files-app --rm --network=queryfilesappit_qfa_backend_net  j9soft/query-files-app:0.1.0
