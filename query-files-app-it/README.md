@@ -85,6 +85,7 @@ behave
 
 ## @TODO
 
+- add mistakes-in-url.feature - to verify that correct HTTP error codes are returned
 - Use pytest-bdd instead of behave, because assert messages are better
   https://automationpanda.com/2018/10/22/python-testing-101-pytest-bdd/
   "all of pytest‘s features and plugins can be used with pytest-bdd. This is a huge advantage!"
