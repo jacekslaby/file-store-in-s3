@@ -1,7 +1,9 @@
+"""Module provides logic to access domains and files kept in s3."""
+
 import boto3
 import os
 import logging
-from s3filestore.query_files import get_files_from_domains
+from s3filestore.query_files import get_domains_with_files
 
 logger = logging.getLogger(__name__)
 
@@ -43,11 +45,8 @@ class S3FileStore:
 
     Instances of this class can be used like this:
     s3FileStore = s3filestore.S3FileStore()
-    files = s3FileStore.get_files_from_domains('shell|bp.*')
+    files = s3FileStore.get_domains_with_files('shell|bp.*')
     """
-
-    # Separator used in bucket name, e.g. <environment>--<domain>--<UUID> = testenv--shell--234666
-    NAME_SEPARATOR = '--'
 
     def __init__(self):
         if s3_config is None:
@@ -57,8 +56,8 @@ class S3FileStore:
             # We are on local dev environment and we want to tell boto3 where to connect.
             self.s3_resource = boto3.resource('s3', **s3_config)
 
-    def get_files_from_domains(self, read_domain_regex_str):
-        """retrieve files from matching domains.
+    def get_domains_with_files(self, read_domain_regex_str):
+        """retrieves domains (with files) matching regex.
            Returns a dict containing domain names as keys and lists of file names as values."""
 
-        return get_files_from_domains(self.s3_resource, environment_name, read_domain_regex_str)
+        return get_domains_with_files(self.s3_resource, environment_name, read_domain_regex_str)

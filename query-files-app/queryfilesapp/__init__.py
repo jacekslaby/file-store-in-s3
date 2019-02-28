@@ -1,3 +1,5 @@
+"""Package contains a flask app which provides HTTP based read access to domains and files kept in s3."""
+
 import logging
 from flask import Flask, jsonify, request
 
@@ -42,10 +44,10 @@ def bad_request(message):
     return response
 
 
-# Example: http://127.0.0.1:5000/v1/files?read_domain_regex=shell
-@app.route('/v1/files')
-def get_files():
-    # Get regex for domains from URL parameter.
+# Example: http://127.0.0.1:5000/v1/domains?read_domain_regex=shell
+@app.route('/v1/domains')
+def get_domains_with_files():
+    # Extract regex for domains from URL parameter.
     # ( https://stackoverflow.com/questions/15182696/multiple-parameters-in-in-flask-approute )
     param_name = 'read_domain_regex'
     arg_read_domain_regex = request.args.get(param_name)
@@ -54,7 +56,7 @@ def get_files():
 
     # Retrieve files from matching domains.
     # ( http://flask.pocoo.org/docs/1.0/patterns/jquery/ )
-    files = s3_file_store.get_files_from_domains(arg_read_domain_regex)
+    files = s3_file_store.get_domains_with_files(arg_read_domain_regex)
 
     return jsonify(files)
 

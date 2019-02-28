@@ -29,7 +29,7 @@ pip install -r requirements.txt
 (query-files-app) $ cd file-store-in-s3/query-files-app
 pytest
 
-http://127.0.0.1:5000/v1/files?read_domain_regex=shell
+http://127.0.0.1:5000/v1/domains?read_domain_regex=shell
 ```
 
 ### Running

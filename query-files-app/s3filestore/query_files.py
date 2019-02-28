@@ -1,3 +1,6 @@
+"""Module provides logic to retrieve domains and their files
+   based on buckets and objects existing in s3."""
+
 import re
 import logging
 
@@ -7,8 +10,8 @@ _logger = logging.getLogger(__name__)
 _NAME_SEPARATOR = '--'
 
 
-def get_files_from_domains(s3_resource, environment_name, read_domain_regex_str):
-    """From s3 retrieve files from domains matching the read_domain_regex_str existing in the specified environment.
+def get_domains_with_files(s3_resource, environment_name, read_domain_regex_str):
+    """From s3 retrieves domains matching the read_domain_regex_str and existing in the specified environment.
 
        Returns a dict containing domain names as keys.
        Each domain has a corresponding value being a list of file names from that domain."""
@@ -24,7 +27,7 @@ def get_files_from_domains(s3_resource, environment_name, read_domain_regex_str)
     domains_with_buckets = _get_domains_with_buckets(environment_name, all_buckets_names, read_domain_regex_str)
 
     # Load file names for every domain. File names are names of objects from a domain's bucket.
-    return _get_file_names_from_objects(s3_resource, domains_with_buckets)
+    return _get_domains_with_file_names(s3_resource, domains_with_buckets)
 
 
 def _get_all_buckets_names(s3_resource):
@@ -71,7 +74,7 @@ def _get_domains_with_buckets(environment_name, all_buckets_names, read_domain_r
     return result
 
 
-def _get_file_names_from_objects(s3_resource, domains_with_buckets):
+def _get_domains_with_file_names(s3_resource, domains_with_buckets):
     """retrieve file names from object names from every bucket.
        Returns a dict containing domain names as keys and lists of file names as values."""
 
@@ -84,5 +87,5 @@ def _get_file_names_from_objects(s3_resource, domains_with_buckets):
         domain_file_names = [obj.key for obj in bucket.objects.all()]
         result[domain_name] = domain_file_names
 
-    _logger.info("S3FileStore: _get_file_names_from_objects = '%s'", result)
+    _logger.info("S3FileStore: _get_domains_with_file_names = '%s'", result)
     return result
