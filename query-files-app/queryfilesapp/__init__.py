@@ -44,18 +44,26 @@ def bad_request(message):
     return response
 
 
-# Example: http://127.0.0.1:5000/v1/domains?read_domain_regex=shell
 @app.route('/v1/domains')
 def get_domains_with_files():
+    """Retrieves domains matching a specified regex.
+
+    Returns a JSON object containing key:value pairs  (i.e. a dict)
+     where key is a domain name (string)
+     and value is a list of files names (strings).
+
+     Example: http://127.0.0.1:5000/v1/domains?read_domain_regex=shell
+    """
+
     # Extract regex for domains from URL parameter.
-    # ( https://stackoverflow.com/questions/15182696/multiple-parameters-in-in-flask-approute )
+    # ( https://stackoverflow.com/questions/15182696/multiple-parameters-in-in-flask-approute
+    #   http://flask.pocoo.org/docs/1.0/patterns/jquery/ )
     param_name = 'read_domain_regex'
     arg_read_domain_regex = request.args.get(param_name)
     if arg_read_domain_regex is None:
         return bad_request(f"Missing required query parameter '{param_name}' in request URL.")
 
-    # Retrieve files from matching domains.
-    # ( http://flask.pocoo.org/docs/1.0/patterns/jquery/ )
+    # Retrieve matching domains with files.
     files = s3_file_store.get_domains_with_files(arg_read_domain_regex)
 
     return jsonify(files)
