@@ -16,8 +16,10 @@ register_type(Text=lambda param: param)
 
 @when(u'I download "{files_count:Int}" files from domain "{domain_name:Text}"')
 def step_impl(context, files_count, domain_name):
-    # Let's store values in the context for the next steps.
+
     # @TODO Add support for scenario where downloading from more than one domain.
+
+    # Let's store values in the context for the next steps.
     context.download_file_domain_name = domain_name
     context.download_file_files_count = files_count
 
@@ -31,7 +33,8 @@ def file_download_response(context, file_number):
     # We need to quote names before putting them in URL. (e.g. file names may contain '/' characters)
     # (see also: https://stackoverflow.com/questions/1695183/how-to-percent-encode-url-parameters-in-python )
     file_name_in_url = quote(context.download_file_domain_name + ':' + str(file_number), safe='')
-    domain_name_in_url = quote(context.download_file_domain_name, safe='')
+    # Note: we use lower() because our test buckets were created with lowercase.
+    domain_name_in_url = quote(context.download_file_domain_name.lower(), safe='')
 
     # Download a file.
     url = (context.query_files_app_url
@@ -60,7 +63,7 @@ def step_impl(context):
         print(f"Received result from HTTP request to query-files-app: {r.json()}")
 
         # The result contains (pre-signed) URL which we use for a download request.
-        download_url = r.json()['download-url']
+        download_url = r.json()['download_url']
 
         # Download file contents.
         file_contents_response = requests.get(download_url)
