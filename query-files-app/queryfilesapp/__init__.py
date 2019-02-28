@@ -19,6 +19,7 @@ else:
     # Configure loggers from s3filestore lib to follow gunicorn level and handlers.
     for module_logger in (
             logging.getLogger('s3filestore.s3_file_store'),
+            logging.getLogger('s3filestore.download_files'),
             logging.getLogger('s3filestore.query_files')
     ):
         module_logger.handlers = gunicorn_logger.handlers
