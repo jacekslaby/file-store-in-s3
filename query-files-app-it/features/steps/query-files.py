@@ -22,7 +22,7 @@ def step_impl(context, files_count, domain_name):
 @when(u'I query for files from domain matching regexp "{domain_regex:Text}"')
 def step_impl(context, domain_regex):
     # Let's load files matching domain regexp.
-    url = context.query_files_app_url + '/v1/files?read_domain_regex=' + quote(domain_regex, safe='')
+    url = context.query_files_app_url + '/v1/domains?read_domain_regex=' + quote(domain_regex, safe='')
     r = requests.get(url)
     r.raise_for_status()
 
@@ -30,9 +30,9 @@ def step_impl(context, domain_regex):
     context.domain_regex = domain_regex
 
     # Store the returned files in the context for the next steps.
-    context.returned_files = r.json()
+    context.returned_domains_with_files = r.json()
 
-    print(f"Received result from HTTP request to query-files-app: {context.returned_files}")
+    print(f"Received result from HTTP request to query-files-app: {context.returned_domains_with_files}")
 
 
 @then(u'I receive "{files_count:Int}" files from domain "{domain_name:Text}"')
@@ -41,10 +41,10 @@ def step_impl(context, files_count, domain_name):
     s3_domain_name = domain_name.lower()
 
     # Check whether domain is returned at all
-    assert s3_domain_name in context.returned_files, f"Domain '{domain_name}' was not returned at all"
+    assert s3_domain_name in context.returned_domains_with_files, f"Domain '{domain_name}' was not returned at all"
 
     # Let's remove the selected domain from the result kept in context. (so that other steps do not see it)
-    returned_domain_files = context.returned_files.pop(s3_domain_name)
+    returned_domain_files = context.returned_domains_with_files.pop(s3_domain_name)
 
     if files_count < 1 and 0 == len(returned_domain_files):
         # Nothing more to check.
@@ -67,4 +67,5 @@ def step_impl(context, files_count, domain_name):
 def step_impl(context):
     # Let's check that we have processed all the returned files,
     #  i.e. check that there is no domain left in the result kept in the context.
-    assert {} == context.returned_files, f"Not expected additional domains were returned: {context.returned_files}"
+    assert {} == context.returned_domains_with_files,\
+        f"Not expected additional domains were returned: {context.returned_domains_with_files}"
