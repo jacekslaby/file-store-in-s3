@@ -53,6 +53,7 @@ pytest
     * and with env variables:
         * FLASK_APP=queryfilesapp
         * QFA_AWS_S3_ENDPOINT_URL=http://192.168.99.100:4572
+        * (Note: Instead of connecting to s3 it will connect to a `localstack` instance available at this URL.)
  
 2. Using flask
     * Add 'Run' configuration 
@@ -78,9 +79,6 @@ docker run -it -p 8000:8000 -e "QFA_AWS_S3_ENDPOINT_URL=http://192.168.99.100:45
 # E.g. in order to connect to a localstack instance running on docker-machine:
 QFA_ENVIRONMENT_NAME=it
 QFA_AWS_S3_ENDPOINT_URL=http://192.168.99.100:4572
-AWS_DEFAULT_REGION=dummy
-AWS_ACCESS_KEY_ID=AccessKeyIfNeeded
-AWS_SECRET_ACCESS_KEY=SecertKeyIfNeeded
 flask run
 ```
 
