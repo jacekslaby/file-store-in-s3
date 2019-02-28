@@ -70,6 +70,8 @@ class S3FileStore:
         """retrieves a file-download object containing properties to be used by a client to launch a download operation.
 
            Returns a dict containing {'download_url': '<URL to be used>'}.
+           (Note: It is a dict because in the future additional keys may be added, e.g. to support file encryption.)
+
            Returns None if domain or file do not exist.
            Returns None if user does not have privileges to the file."""
 
