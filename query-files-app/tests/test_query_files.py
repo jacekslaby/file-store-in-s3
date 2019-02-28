@@ -1,5 +1,5 @@
 from s3filestore.query_files import _get_domains_with_buckets
-from s3filestore.query_files import NAME_SEPARATOR
+from s3filestore.query_files import _NAME_SEPARATOR
 import pytest
 
 # Data used to create test scenarios, i.e. to create inputs and expected results.
@@ -12,8 +12,8 @@ def setup_test_data():
     """return a list containing tuples where each tuple represents a single test scenario"""
 
     def generate_bucket_name(domain_name, domain_unique_suffix):
-        return environment_name + NAME_SEPARATOR + domain_name\
-               + NAME_SEPARATOR + str(domain_unique_suffix)
+        return environment_name + _NAME_SEPARATOR + domain_name \
+               + _NAME_SEPARATOR + str(domain_unique_suffix)
 
     map_domain_to_bucket = {}
     for i, domain_name_str in enumerate(test_domain_names):
