@@ -47,16 +47,22 @@ def bad_request(message):
     return response
 
 
-def extract_param_from_request(param_name, request_args):
+def extract_param_from_request(param_name, request_args, request_headers):
     """Extracts value of a parameter by its name. Returns it as str. Throws ValueError if parameter not found."""
 
-    # ( see:
-    #   https://stackoverflow.com/questions/15182696/multiple-parameters-in-in-flask-approute
-    #   http://flask.pocoo.org/docs/1.0/patterns/jquery/ )
-    param_value = request_args.get(param_name)
+    # If parameter is defined in headers then this value is used.
+    param_value = request_headers.get(param_name)
 
     if param_value is None:
-        raise ValueError(f"Missing required query parameter '{param_name}' in request URL.")
+        # Otherwise we try query params.
+
+        # ( see:
+        #   https://stackoverflow.com/questions/15182696/multiple-parameters-in-in-flask-approute
+        #   http://flask.pocoo.org/docs/1.0/patterns/jquery/ )
+        param_value = request_args.get(param_name)
+
+    if param_value is None:
+        raise ValueError(f"Missing required query parameter '{param_name}' in request URL and headers.")
 
     return param_value
 
@@ -74,7 +80,7 @@ def get_domains_with_files():
 
     # Extract input parameters from URL.
     try:
-        arg_read_domain_regex = extract_param_from_request('read_domain_regex', request.args)
+        arg_read_domain_regex = extract_param_from_request('read_domain_regex', request.args, request.headers)
     except ValueError as e:
         return bad_request(str(e))
 
@@ -95,9 +101,9 @@ def get_file_download():
 
     # Extract input parameters from URL.
     try:
-        arg_read_domain_regex = extract_param_from_request('read_domain_regex', request.args)
-        domain_name = extract_param_from_request('domain_name', request.args)
-        file_name = extract_param_from_request('file_name', request.args)
+        arg_read_domain_regex = extract_param_from_request('read_domain_regex', request.args, request.headers)
+        domain_name = extract_param_from_request('domain_name', request.args, request.headers)
+        file_name = extract_param_from_request('file_name', request.args, request.headers)
     except ValueError as e:
         return bad_request(str(e))
 
