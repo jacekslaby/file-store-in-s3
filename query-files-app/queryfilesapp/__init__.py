@@ -111,5 +111,15 @@ def get_file_download():
         return abort(404)
 
 
+@app.route('/headers')
+def get_headers():
+    """Used to debug headers provided by Zappa when using Cognito authorizer.
+
+    Returns a JSON object containing dictionary of headers.
+    """
+
+    return jsonify({k: v for k, v in request.headers})
+
+
 if __name__ == "__main__":
     app.run(debug=True)
