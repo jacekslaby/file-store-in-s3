@@ -82,5 +82,9 @@ QFA_AWS_S3_ENDPOINT_URL=http://192.168.99.100:4572
 flask run
 ```
 
+## Deploying to AWS
+
+See [description](README-Zappa-AWS-deployment.md).
+
 ## @TODO
 
